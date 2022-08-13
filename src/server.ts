@@ -40,11 +40,14 @@ import {filterImageFromURL, deleteLocalFiles} from './util/util';
     if(!isValidUrl){
       res.send("invalid url")
     }
-    let filteredpath = await filterImageFromURL(image_url) 
-    await res.sendFile(filteredpath)
-    await deleteLocalFiles([filteredpath])
-   
-    res.send("try GET /filteredimage?image_url={{}}")
+    try {
+      let filteredpath = await filterImageFromURL(image_url) 
+      res.status(200).sendFile(filteredpath)
+      deleteLocalFiles([filteredpath])
+    } catch (error) {
+      res.sendStatus(422).send(error)
+    }
+    
   } );
 
   //! END @TODO1
