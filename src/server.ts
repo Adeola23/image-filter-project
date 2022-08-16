@@ -44,11 +44,11 @@ import {filterImageFromURL, deleteLocalFiles} from './util/util';
 
      const isValidUrl = urlValidator.test(image_url)
      
-    //  if (!isValidUrl) {
-    //    return res
-    //      .status(400)
-    //      .send("invalid url.")
-    //  }
+     if (!isValidUrl) {
+       return res
+         .status(400)
+         .send("invalid url.")
+     }
 
     
      try {
