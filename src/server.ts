@@ -8,7 +8,7 @@ import {filterImageFromURL, deleteLocalFiles} from './util/util';
   const app = express();
 
   // Set the network port
-  const port = process.env.PORT || 8082;
+  const port = process.env.PORT || 8083;
   
   // Use the body parser middleware for post requests
   app.use(bodyParser.json());
@@ -35,12 +35,7 @@ import {filterImageFromURL, deleteLocalFiles} from './util/util';
          .status(400)
          .send("Error: an image URL was not supplied.")
      }
-      const urlValidator= new RegExp('^(https?:\\/\\/)?'+ 
-	    '((([a-z\\d]([a-z\\d-]*[a-z\\d])*)\\.)+[a-z]{2,}|'+ 
-	    '((\\d{1,3}\\.){3}\\d{1,3}))'+ 
-	    '(\\:\\d+)?(\\/[-a-z\\d%_.~+]*)*'+ 
-	    '(\\?[;&a-z\\d%_.~+=-]*)?'+ 
-	    '(\\#[-a-z\\d_]*)?$','i'); 
+      const urlValidator= new RegExp(/^(https?):\/\/[^\s$.?#].[^\s]*$/, 'g'); 
 
      const isValidUrl = urlValidator.test(image_url)
      
