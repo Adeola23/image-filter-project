@@ -8,7 +8,7 @@ import {filterImageFromURL, deleteLocalFiles} from './util/util';
   const app = express();
 
   // Set the network port
-  const port = process.env.PORT || 8083;
+  const port = process.env.PORT || 8084;
   
   // Use the body parser middleware for post requests
   app.use(bodyParser.json());
@@ -48,8 +48,8 @@ import {filterImageFromURL, deleteLocalFiles} from './util/util';
     
      try {
        let filteredpath: string = await filterImageFromURL(image_url)
-       res.sendFile(filteredpath)
-       deleteLocalFiles([filteredpath])
+       res.sendFile(filteredpath, function(){deleteLocalFiles([filteredpath])})
+       
       
      } catch (err) {
        console.error("Failed to filter image because of this error:", err)
