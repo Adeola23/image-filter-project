@@ -1,4 +1,4 @@
-import express from 'express';
+import express, { Router, Request, Response }  from 'express';
 import bodyParser from 'body-parser';
 import {filterImageFromURL, deleteLocalFiles} from './util/util';
 
@@ -8,7 +8,7 @@ import {filterImageFromURL, deleteLocalFiles} from './util/util';
   const app = express();
 
   // Set the network port
-  const port = process.env.PORT || 8083;
+  const port = process.env.PORT || 8084;
   
   // Use the body parser middleware for post requests
   app.use(bodyParser.json());
@@ -28,27 +28,40 @@ import {filterImageFromURL, deleteLocalFiles} from './util/util';
   //   the filtered image file [!!TIP res.sendFile(filteredpath); might be useful]
 
   /**************************************************************************** */
-  app.get( "/filteredimage", async ( req, res ) => {
-    let {image_url} = req.query
-    const urlValidator= new RegExp('^(https?:\\/\\/)?'+ 
-	    '((([a-z\\d]([a-z\\d-]*[a-z\\d])*)\\.)+[a-z]{2,}|'+ 
-	    '((\\d{1,3}\\.){3}\\d{1,3}))'+ 
-	    '(\\:\\d+)?(\\/[-a-z\\d%_.~+]*)*'+ 
-	    '(\\?[;&a-z\\d%_.~+=-]*)?'+ 
-	    '(\\#[-a-z\\d_]*)?$','i'); 
-    const isValidUrl = urlValidator.test(image_url)
-    if(!isValidUrl){
-      res.send("invalid url")
-    }
-    try {
-      let filteredpath = await filterImageFromURL(image_url) 
-      res.status(200).sendFile(filteredpath)
-      deleteLocalFiles([filteredpath])
-    } catch (error) {
-      res.sendStatus(422).send(error)
-    }
+  app.get( "/filteredimage", async ( req: Request, res: Response ) => {
+  const {image_url} = req.query
+     if (!image_url) {
+       return res
+         .status(400)
+         .send("Error: an image URL was not supplied.")
+     }
+      const urlValidator= new RegExp(/^(https?):\/\/[^\s$.?#].[^\s]*$/, 'g'); 
+
+     const isValidUrl = urlValidator.test(image_url)
+     
+     if (!isValidUrl) {
+       return res
+         .status(400)
+         .send("invalid url.")
+     }
+
     
-  } );
+     try {
+       let filteredpath: string = await filterImageFromURL(image_url)
+       res.sendFile(filteredpath, function(){deleteLocalFiles([filteredpath])})
+       
+      
+     } catch (err) {
+       console.error("Failed to filter image because of this error:", err)
+       return res
+         .status(500)
+         .send("There was a problem fetching your image. Please check the URL and try again.")
+     }
+     })
+  
+   
+    
+  ;
 
   //! END @TODO1
   
